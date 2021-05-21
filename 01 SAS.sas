@@ -153,3 +153,199 @@ Select a.col1, a.col2, a.col3, b.col1, b.col2, b.col3
 	from data1 as a, data2 as b
 	where a.key = b.key order by a.col desc;
 quit;
+
+
+/*
+Exporting files
+
+PROC EXPORT DATA = input-table OUTFILE = "output-file" <DBMS=identifier> <REPLACE>;
+RUN;
+
+*/
+
+
+/*
+Another way is to defile library with engine and write files out to that library directly.
+
+ODS <destination> <destination-specifications>;
+
+SAS code that produces output
+
+ODS <destination> CLOSE;
+
+*/
+
+libname mylib2 xlsx "H:/SAS/customlibxlsx/testXL.xlsx";
+
+DATA mylib2.CarsCheap;
+	SET mylib.Carscheap;
+RUN;
+
+libname mylib2 clear;
+
+
+
+
+/*
+Exporting CSV Files
+*/
+
+ODS CSVALL file = "H:\SAS\customlibxlsx\testCSV.csv";
+
+PROC PRINT data = Sashelp.Cars ;
+	var Make Model Type MSRP MPG_City MPG_Highway;
+	format MSRP dollar8.;
+RUN;
+ODS CSVALL close;
+
+
+
+/*
+EXPORTING XLSX files
+
+ODS EXCEL FILE = "filename.xlsx" STYPE = style OPTIONS(SHEET_NAME = 'label');
+
+SAS Code that produces output
+
+ODS EXCEL CLOSE;
+
+*/
+
+
+PROC MEANS data = Sashelp.Heart mean median min max maxdec = 0;	
+	var Height;
+	CLASS Chol_Status;	
+run;
+
+proc sgplot data=Sashelp.Heart;
+	histogram Weight;
+	density Height;
+run;
+
+
+
+/*List all availabel style options*/
+proc template;
+	list styles;
+run;
+
+
+
+ODS EXCEL file = "H:/SAS/customlibxlsx/excel.xlsx" options(Sheet_name = "Means");
+
+PROC MEANS data = Sashelp.Heart mean median min max maxdec = 0;	
+	var Height;
+	CLASS Chol_Status;	
+run;
+
+ODS EXCEL  options(Sheet_name = "Plots");
+proc sgplot data=Sashelp.Heart;
+	histogram Weight;
+	density Height;
+run;
+
+ODS EXCEL CLOSE;
+
+
+/*
+Notice of style below. It will generate excel files that is not greyed out
+*/
+
+ODS EXCEL file = "H:/SAS/customlibxlsx/excel.xlsx" style = sasdocprinter options(Sheet_name = "Means");
+
+PROC MEANS data = Sashelp.Heart mean median min max maxdec = 0;	
+	var Height;
+	CLASS Chol_Status;	
+run;
+
+ODS EXCEL options(Sheet_name = "Plots");
+proc sgplot data=Sashelp.Heart;
+	histogram Weight;
+	density Height;
+run;
+
+ODS EXCEL CLOSE;
+
+
+
+/*
+EXPORTING TO POWERPOINT AND RTF
+
+ODS POWERPOINT FILE = "filename.pptx" STYLE = style;
+SAS Code that produces output
+ODS POWERPOINT CLOSE;
+
+
+ODS RTF FILE = "filename.rtf" STARTPAGE=NO;
+SAS Code that produces output
+ODS RTF CLOSE;
+
+*/
+
+
+
+/*
+PDF FILE
+
+ODS PDF FILE = "filename.pdf" STYLE = style STARTPAGE=NO ODFTOOC=n;
+ODS PROCLABEL "label";
+SAS Code that produces output
+ODS PDFT CLOSE;
+
+*/
+
+
+ODS PDF file = "H:/SAS/customlibxlsx/pdf.pdf";
+
+PROC MEANS data = Sashelp.Heart mean median min max maxdec = 0;	
+	var Height;
+	CLASS Chol_Status;	
+run;
+
+
+proc sgplot data=Sashelp.Heart;
+	histogram Weight;
+	density Height;
+run;
+
+ODS PDF CLOSE;
+
+
+
+
+ODS PDF file = "H:/SAS/customlibxlsx/pdf.pdf" startpage=no;			*startpage=no will stop page break;
+
+PROC MEANS data = Sashelp.Heart mean median min max maxdec = 0;	
+	var Height;
+	CLASS Chol_Status;	
+run;
+
+
+proc sgplot data=Sashelp.Heart;
+	histogram Weight;
+	density Height;
+run;
+
+ODS PDF CLOSE;
+
+
+
+
+
+
+
+ODS PDF file = "H:/SAS/customlibxlsx/pdf.pdf" startpage=no style = journal  pdftoc=1;			
+
+ODS PROCLABEL "Means";
+PROC MEANS data = Sashelp.Heart mean median min max maxdec = 0;	
+	var Height;
+	CLASS Chol_Status;	
+run;
+
+ODS PROCLABEL "Plots";
+proc sgplot data=Sashelp.Heart;
+	histogram Weight;
+	density Height;
+run;
+
+ODS PDF CLOSE;
